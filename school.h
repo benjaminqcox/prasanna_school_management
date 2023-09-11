@@ -26,17 +26,17 @@ typedef struct Grade
 } Grade_t;
 
 // Function prototypes
-int addStudent(Student_t **students, Grade_t **grades)
-int addTeacher(Teacher_t *teachers, int *teacherCount);
-int assignGrade(Grade_t *grades, int *gradeCount, Student_t *students, int studentID, int studentCount, const char *subject, int score);
+void freeGrades(Grade_t *** grades);
+void freeStudents(Student_t ** students);
+void freeTeachers(Teacher_t ** teachers);
+void addEmptyGrade(Grade_t ***grades, int *numGrades,  int studentId, char * subject);
+void addStudent(Student_t ***students, int *numStudents, Grade_t ***grades, int *numGrades);
+void addTeacher(Teacher_t ***teachers, int *numTeachers);
+void assignGrade(Grade_t *grades, int *gradeCount, Student_t *students, int studentID, int studentCount, const char *subject, int score);
 void findStudentBySubject(Student_t *students, int studentCount, const char *subject);
 void findTeacherBySubject(Teacher_t *teachers, int teacherCount, const char *subject);
 void findGradesByStudentAndSubject(Grade_t *grades, int gradeCount, int studentID, const char *subject);
-
-// Function to get user input for subject
-void getInputSubject(char *subject);
-
-int handleAssignGrade(Grade_t *grades, int *gradeCount, Student_t *students, int studentCount);
+void handleAssignGrade(Grade_t *grades, int *gradeCount, Student_t *students, int studentCount);
 void handleFindGradesByStudentAndSubject(Grade_t *grades, int gradeCount);
 
 #endif // SCHOOL_H

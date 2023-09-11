@@ -24,10 +24,23 @@ char * getStringInput()
             exit(EXIT_FAILURE);
         }
         fgets(buf + last, BUFSIZ, stdin);
+        // Check null on fgets
         len = strlen(buf);
         last = len - 1;
     } while (!feof(stdin) && buf[last] != '\n');
     return buf;
+}
+ 
+char ** getArrayOfStringsInput(char * terminator)
+{
+    char ** strArr = NULL;
+    char * currInput = getStringInput();
+    while (strncmp(currInput, terminator, strlen(currInput)) != 0)
+    {
+        /* code */
+    }
+    return strArr;
+    
 }
 
 int getIntInput()
@@ -44,19 +57,25 @@ int getIntInput()
         chosenVal = (int)strtol(strVal, &endPtr, 10);
     }
 
+    printf("You have chosen the value: %d", chosenVal);
     return chosenVal;
 }
 
 int getIntInputInRange(int low, int high)
 {
+    // If the low range is higher than the high range then an invalid input has been used
     if (low > high)
     {
         fprintf(stderr, "The chosen range will indefinitely loop. Please choose a valid range.\n");
         exit(EXIT_FAILURE);
     }
+    // Ask for user input within range
+    printf("Please enter an integer within the range of %d and %d\n", low, high);
     int chosenVal = getIntInput();
+    // while the value is out of the specified range, keep asking for a new input
     while (chosenVal < low || chosenVal > high)
     {
+        printf("%d is not within the range of %d and %d\n", chosenVal, low, high);
         chosenVal = getIntInput();
     }
     return chosenVal;

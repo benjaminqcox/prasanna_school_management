@@ -1,12 +1,17 @@
 #include "school.h"
 #include "userInput.h"
 #include <stdio.h>
+#include <string.h>
 
 int main()
 {
-    Student_t * students;
-    Teacher_t * teachers;
-    Grade_t * grades;
+    // Up to handle assign grade
+
+    Student_t ** students = NULL;
+    Teacher_t ** teachers = NULL;
+    Grade_t ** grades = NULL;
+
+    int numStudents = 0, numTeachers = 0, numGrades = 0;
 
     while (1)
     {
@@ -27,7 +32,7 @@ int main()
         switch (choice)
         {
         case 1:
-            addStudent(&students, &grades);
+            addStudent(&students, &numStudents, &grades, &numGrades);
             break;
         case 2:
             addTeacher(&teachers);
@@ -53,6 +58,8 @@ int main()
             printf("Invalid choice. Try again.\n");
         }
     }
-
+    freeGrades(&grades);
+    freeStudents(students);
+    freeTeachers(teachers);
     return 0;
 }
