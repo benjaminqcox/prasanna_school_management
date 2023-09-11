@@ -1,0 +1,4 @@
+int getIntInput();
+
+char * getStringInput();
+
