@@ -32,11 +32,11 @@ void freeTeachers(Teacher_t ** teachers);
 void addEmptyGrade(Grade_t ***grades, int *numGrades,  int studentId, char * subject);
 void addStudent(Student_t ***students, int *numStudents, Grade_t ***grades, int *numGrades);
 void addTeacher(Teacher_t ***teachers, int *numTeachers);
+void handleAssignGrade(Grade_t *grades, int *gradeCount, Student_t *students, int studentCount);
 void assignGrade(Grade_t *grades, int *gradeCount, Student_t *students, int studentID, int studentCount, const char *subject, int score);
 void findStudentBySubject(Student_t *students, int studentCount, const char *subject);
 void findTeacherBySubject(Teacher_t *teachers, int teacherCount, const char *subject);
 void findGradesByStudentAndSubject(Grade_t *grades, int gradeCount, int studentID, const char *subject);
-void handleAssignGrade(Grade_t *grades, int *gradeCount, Student_t *students, int studentCount);
 void handleFindGradesByStudentAndSubject(Grade_t *grades, int gradeCount);
 
 #endif // SCHOOL_H
