@@ -49,6 +49,11 @@ int getIntInput()
 
 int getIntInputInRange(int low, int high)
 {
+    if (low > high)
+    {
+        fprintf(stderr, "The chosen range will indefinitely loop. Please choose a valid range.\n");
+        exit(EXIT_FAILURE);
+    }
     int chosenVal = getIntInput();
     while (chosenVal < low || chosenVal > high)
     {
