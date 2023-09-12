@@ -25,14 +25,17 @@ typedef struct Grade
     // May Add more grade-related data if needed
 } Grade_t;
 
+
 // Function prototypes
-void freeGrades(Grade_t *** grades);
-void freeStudents(Student_t ** students);
-void freeTeachers(Teacher_t ** teachers);
+void freeGrades(Grade_t *** grades, int numGrades);
+void freeStudents(Student_t ** students, int numStudents);
+void freeTeachers(Teacher_t ** teachers, int numTeachers);
+Grade_t **findGradesByStudentId(Grade_t **grades, int numGrades, int id);
+int findNumGradesByStudentId(Grade_t **grades, int numGrades, int id);
+int *findStudentsBySubject(Grade_t **grades, int numGrades, char *subject);
 void addEmptyGrade(Grade_t ***grades, int *numGrades,  int studentId, char * subject);
 void addStudent(Student_t ***students, int *numStudents, Grade_t ***grades, int *numGrades);
 void addTeacher(Teacher_t ***teachers, int *numTeachers);
-void handleAssignGrade(Grade_t *grades, int *gradeCount, Student_t *students, int studentCount);
 void assignGrade(Grade_t *grades, int *gradeCount, Student_t *students, int studentID, int studentCount, const char *subject, int score);
 void findStudentBySubject(Student_t *students, int studentCount, const char *subject);
 void findTeacherBySubject(Teacher_t *teachers, int teacherCount, const char *subject);

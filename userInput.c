@@ -33,11 +33,11 @@ char * getStringInput()
  
 char ** getArrayOfStringsInput(char * terminator)
 {
-    char ** strArr = NULL;
+    char ** strArr = NULL, tempStrArr = NULL;
     char * currInput = getStringInput();
     while (strncmp(currInput, terminator, strlen(currInput)) != 0)
     {
-        /* code */
+        // Neet to add method for adding each input to an array of strings (will involve realloc)
     }
     return strArr;
     
@@ -57,7 +57,7 @@ int getIntInput()
         chosenVal = (int)strtol(strVal, &endPtr, 10);
     }
 
-    printf("You have chosen the value: %d", chosenVal);
+    printf("You have chosen the value: %d\n", chosenVal);
     return chosenVal;
 }
 
