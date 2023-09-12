@@ -33,7 +33,7 @@ char * getStringInput()
  
 char ** getArrayOfStringsInput(char * terminator)
 {
-    char ** strArr = NULL, tempStrArr = NULL;
+    char ** strArr = NULL;
     char * currInput = getStringInput();
     while (strncmp(currInput, terminator, strlen(currInput)) != 0)
     {

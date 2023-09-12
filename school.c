@@ -8,33 +8,39 @@
 
 void freeGrades(Grade_t *** grades, int numGrades)
 {
+    // Loop through every element stored in grades, free it and point it to null
     for (int i = 0; i < numGrades; i++)
     {
         free((*grades)[i]);
         grades[i] = NULL;
     }
+    // Free the parent memory reference and point it to null
     free(*grades);
     *grades = NULL;
 }
 
 void freeStudents(Student_t ** students, int numStudents)
 {
+    // Loop through every element stored in grades, free it and point it to null
     for (int i = 0; i < numStudents; i++)
     {
         free(students[i]);
         students[i] = NULL;
     }
+    // Free the parent memory reference and point it to null
     free(*students);
     *students = NULL;
 }
 
 void freeTeachers(Teacher_t ** teachers, int numTeachers)
 {
+    // Loop through every element stored in grades, free it and point it to null
     for (int i = 0; i < numTeachers; i++)
     {
         free(teachers[i]);
         teachers[i] = NULL;
     }
+    // Free the parent memory reference and point it to null
     free(*teachers);
     *teachers = NULL;
 }
@@ -75,7 +81,7 @@ Grade_t **findGradesByStudentId(Grade_t **grades, int numGrades, int id)
             {
                 // If memory allocation failed, cleanup assigned memory and exit safely
                 fprintf(stderr, "Could not allocate memory.\n");
-                freeGrades(&foundGrades);
+                freeGrades(&foundGrades, numGrades);
                 foundGrades = NULL;
                 exit(EXIT_FAILURE);
             }
@@ -99,24 +105,38 @@ Grade_t **findGradesByStudentId(Grade_t **grades, int numGrades, int id)
     return foundGrades;
 }
 
-int findNumGradesByStudentId(Grade_t **grades, int numGrades, int id)
+int countFoundGrades(Grade_t **grades)
 {
     // Find the number of occurences of a student id in the grades array
-    int numGradesFound = 0;
-    for (int i = 0; i < numGrades; i++)
+    int numGrades = 0;
+    while(grades[numGrades] != NULL)
     {
-        if (grades[i]->studentID == id)
-        {
-            numGradesFound++;
-        }
+        numGrades++;
     }
-    return numGradesFound;
+    return numGrades;
 }
 
-int *findStudentsBySubject(Grade_t **grades, int numGrades, char *subject)
+Grade_t *findStudentsGradeBySubject(Grade_t **grades, char *subject)
 {
-    // Initialise the found student ids and temp found student ids to NULL
-    int *foundStudentIds = NULL, *tempFoundStudentIds = NULL;
+    // Find the number of elements stored in **grades
+    int initNumGrades = countFoundGrades(grades); // Based on the result of findGradesByStudentId();
+    // Go through all the grades stored in grades*
+    for (int i = 0; i < initNumGrades; i++)
+    {
+        // If current grade is equal to the chosen id return the current grade
+        if (strncmp(grades[i]->subject, subject, strlen(grades[i]->subject)) == 0)
+        {
+            return grades[i];
+        }
+    }
+    // Grade was not found with that subject name
+    return NULL;
+}
+
+int *findStudentIdsBySubject(Grade_t **grades, int numGrades, char *subject)
+{ 
+    // Initialise the found student ids
+    int *foundStudentIds = NULL;
     // Set counter to 0
     int numStudentsFound = 0;
     // Loop through all grades
@@ -126,28 +146,25 @@ int *findStudentsBySubject(Grade_t **grades, int numGrades, char *subject)
         if (strncmp(grades[i]->subject, subject, strlen(grades[i]->subject)) == 0)
         {
             // Reallocate the memory to reflect a new item being added and a NULL terminator on the end
-            tempFoundStudentIds = realloc(foundStudentIds, (numStudentsFound + 2) * sizeof(Student_t *));
+            foundStudentIds = (int *)realloc(foundStudentIds, (numStudentsFound + 2) * sizeof(Student_t *));
             // Ensure memory was allocated correctly
-            if(tempFoundStudentIds == NULL)
+            if(foundStudentIds == NULL)
             {
                 // If memory was not allocated correctly, cleanup the currently allocated variables
                 fprintf(stderr, "Could not allocate memory.\n");
                 free(foundStudentIds);
-                free(tempFoundStudentIds);
                 foundStudentIds = NULL;
-                tempFoundStudentIds = NULL;
                 exit(EXIT_FAILURE);
             }
-            // Set the found student ids to the temp student ids so the temp student ids pointer can have realloacted memory
-            // without affecting already stored values
-            foundStudentIds = tempFoundStudentIds;
             // Set the penultimate value to the current value of grades id
             foundStudentIds[numStudentsFound] = grades[i]->studentID;
             // Set the final element of found students to -1 (terminator)
             foundStudentIds[numStudentsFound + 1] = -1;
+            // Increment the students counter
             numStudentsFound++;
         }
     }
+    // Print the number of students found and return the array
     if (numStudentsFound == 0)
     {
         printf("No students found studying %s.\n", subject);
@@ -159,7 +176,6 @@ int *findStudentsBySubject(Grade_t **grades, int numGrades, char *subject)
     return foundStudentIds;
 }
 
-
 void addEmptyGrade(Grade_t ***grades, int *numGrades, int studentId, char *subject)
 {
     // Add jsdoc to explain the arguments and code functionality
@@ -168,7 +184,7 @@ void addEmptyGrade(Grade_t ***grades, int *numGrades, int studentId, char *subje
     size_t gradeSize = sizeof(Grade_t);
     Grade_t *newGrade = (Grade_t *)malloc(gradeSize);
     // Reallocate the memory storing all students to have enough space for another student
-    Grade_t **tempGrades = realloc(*grades, gradeSize * ((*numGrades) + 1));
+    Grade_t **tempGrades = (Grade_t **)realloc(*grades, gradeSize * ((*numGrades) + 1));
     // Allocate memory for the subject to be stored (+1 for the null terminator)
     newGrade->subject = (char *)malloc(subjectLen);
     // Ensure memory was allocated correctly
@@ -178,7 +194,7 @@ void addEmptyGrade(Grade_t ***grades, int *numGrades, int studentId, char *subje
         fprintf(stderr, "Could not allocate memory.\n");
         free(newGrade->subject);
         free(newGrade);
-        freeGrades(&tempGrades);
+        freeGrades(&tempGrades, (*numGrades) + 1);
         free(tempGrades);
         exit(EXIT_FAILURE);
     }
@@ -198,7 +214,6 @@ void addEmptyGrade(Grade_t ***grades, int *numGrades, int studentId, char *subje
     (*numGrades)++;
 }
 
-// Function to add a new student
 void addStudent(Student_t ***students, int *numStudents, Grade_t ***grades, int *numGrades)
 {
     // Allocate memory for a new student to be created and point to it
@@ -215,7 +230,7 @@ void addStudent(Student_t ***students, int *numStudents, Grade_t ***grades, int 
     char * studentSubject = getStringInput();
 
     // Allocate memory for the new students name
-    newStudent->name = (char *)malloc(strlen(studentName));
+    newStudent->name = (char *)malloc(strlen(studentName)); // Need to move this after the NULL check for its parent as I may be accessing invalid memory
 
     // Ensure memory was allocated correctly
     if (newStudent == NULL || tempStudents == NULL || newStudent->name == NULL)
@@ -224,7 +239,7 @@ void addStudent(Student_t ***students, int *numStudents, Grade_t ***grades, int 
         fprintf(stderr, "Could not allocate memory.\n");
         free(newStudent->name);
         free(newStudent);
-        freeStudents(tempStudents, numStudents + 1);
+        freeStudents(tempStudents, (*numStudents) + 1);
         exit(EXIT_FAILURE);
     }
 
@@ -243,7 +258,6 @@ void addStudent(Student_t ***students, int *numStudents, Grade_t ***grades, int 
     (*numStudents)++;
 }
 
-// Function to add a new teacher
 void addTeacher(Teacher_t ***teachers, int *numTeachers)
 {
     // Get teacher information
@@ -253,14 +267,12 @@ void addTeacher(Teacher_t ***teachers, int *numTeachers)
     char * teacherName = getStringInput();
     printf("Enter subject taught by the teacher: ");
     char * teacherSubject = getStringInput();
-
     // Teacher name and subject length
     size_t teacherNameLen = strlen(teacherName);
     size_t teacherSubjectLen = strlen(teacherSubject);
-
+    
     // Allocate memory to store the teacher and teacher information
-    Teacher_t **tempTeachers = realloc(*teachers, sizeof(Teacher_t*) * ((*numTeachers) + 1));
-    printf("Sizeof tempTeachers: %lu, Numteachers: %d\n", sizeof(*tempTeachers), *numTeachers);
+    Teacher_t **tempTeachers = (Teacher_t **)realloc(*teachers, sizeof(Teacher_t*) * ((*numTeachers) + 1));
     Teacher_t *newTeacher = (Teacher_t *)malloc(sizeof(Teacher_t));
     newTeacher->name = (char *)malloc(teacherNameLen);
     newTeacher->subject = (char *)malloc(teacherSubjectLen);
@@ -275,20 +287,21 @@ void addTeacher(Teacher_t ***teachers, int *numTeachers)
     {
         // If memory was not allocated, cleanup any memory exit safely
         fprintf(stderr, "Could not allocate memory.\n");
-        
         free(newTeacher->name);
         free(newTeacher->subject);
         free(newTeacher);
-        freeTeachers(tempTeachers);
+        freeTeachers(tempTeachers, (*numTeachers) + 1);
         exit(EXIT_FAILURE);
     }
 
+    
     // Set the id of newTeacher
     newTeacher->teacherID = teacherId;
 
     // Set the values of newTeacher name and subject
     strlcpy(newTeacher->name, teacherName, teacherNameLen);
     strlcpy(newTeacher->subject, teacherSubject, teacherSubjectLen);
+
 
     // Add the new teacher to the teachers array
     tempTeachers[*numTeachers] = newTeacher;
@@ -298,66 +311,62 @@ void addTeacher(Teacher_t ***teachers, int *numTeachers)
     (*numTeachers)++;
 }
 
-// Function to assign a grade to a student
-void assignGrade(Grade_t *grades, int *gradeCount, Student_t *students, int studentID, int studentCount, const char *subject, int score)
+void assignGrade(Grade_t ***grades, int *numGrades)
 {
-    // printf("Enter the student ID: ");
-    // int studentId = getIntInput();
-    // // Add check for student exists
-    // printf("Enter the subject: ");
-    // char *subject = getStringInput();
-    // // Add check for subject extisting
-    // printf("Enter the student score: ");
-    // int studentScore = getIntInputInRange(0, 100);
-    // // Check if there's space in the grades array
-
-    //     if (studentIndex != -1)
-    //     {
-    //         // Assign the grade
-    //         Grade_t newGrade;
-    //         newGrade.studentID = studentID;
-    //         strlcpy(newGrade.subject, subject, sizeof(newGrade.subject));
-    //         newGrade.score = score;
-    //         grades[*gradeCount] = newGrade;
-    //         (*gradeCount)++;
-    //         printf("Grade assigned successfully.\n");
-    //         return *gradeCount;
-    //     }
-    //     else
-    //     {
-    //         printf("Student not found with ID %d studying %s. Cannot assign grade.\n", studentID, subject);
-    //         return *gradeCount;
-    //     }
+    printf("Enter the student ID: ");
+    int studentId = getIntInput();
+    // Add check for student exists
+    printf("Enter the subject: ");
+    char *subject = getStringInput();
+    // Add check for subject extisting
+    printf("Enter the student score: ");
+    int studentScore = getIntInputInRange(0, 100);
+    // Find the grade for the chosen student and subject
+    Grade_t **studentGrades = findGradesByStudentId(*grades, *numGrades, studentId);
+    Grade_t *toUpdate = findStudentsGradeBySubject(studentGrades, subject);
+    // Ensure the subject has the correct amount of memory
+    toUpdate->subject = (char *)realloc(toUpdate->subject, strlen(subject));
+    if (toUpdate->subject == NULL)
+    {
+        // Cleanup the newGrade memory, print the failure and exit safely
+        fprintf(stderr, "Could not allocate memory.\n");
+        freeGrades(&studentGrades, countFoundGrades(studentGrades));
+        free(toUpdate);
+        studentGrades = NULL;
+        toUpdate = NULL;
+        exit(EXIT_FAILURE);
+    }
+    // Copy the chosen string to the memory of newGrade
+    strlcpy(toUpdate->subject, subject, sizeof(toUpdate->subject));
+    // Assign the values of student id and score
+    toUpdate->studentID = studentId;
+    toUpdate->score = studentScore;
 }
 
-// Function to find students by subject
-void findStudentBySubject(Student_t *students, int studentCount, const char *subject)
+void printStudentsFromIds(Student_t **students, int numStudents, int *studentIds)
 {
-    // Implement the logic to find students by subject
-   
+    Student_t *currentStudent;
+    int numIds = 0;
+    while (studentIds[numIds] != -1)
+    {
+        numIds++;
+    }
+    // Double for loop to check each student id vs each students id
+    // Not very efficient but it will work
 }
 
-// Function to find teachers by subject
+void printGrades(Grade_t **grades)
+{
+    int numGrades = countFoundGrades(grades);
+    for (int i = 0; i < numGrades; i++)
+    {
+        printf("%d: Student ID: %d, Subject: %s, Score: %d", i, grades[i]->studentID, grades[i]->subject, grades[i]->score);
+    }
+}
+
 void findTeacherBySubject(Teacher_t *teachers, int teacherCount, const char *subject)
 {
     // Implement the logic to find teachers by subject
+
    
-}
-
-// Function to handle finding grades by student and subject
-void handleFindGradesByStudentAndSubject(Grade_t *grades, int gradeCount)
-{
-    // char subject[MAX_STRING_LENGTH];
-    // int studentID;
-    // getInputSubject(subject);
-    // printf("Enter the student ID: ");
-    // scanf("%d", &studentID);
-    // findGradesByStudentAndSubject(grades, gradeCount, studentID, subject);
-}
-
-// Function to find grades by student and subject
-void findGradesByStudentAndSubject(Grade_t *grades, int gradeCount, int studentID, const char *subject)
-{
-    // Implement the logic to find grades by student and subject
-  
 }

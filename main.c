@@ -29,49 +29,45 @@ int main()
         printf("Enter your choice: ");
         int choice = getIntInputInRange(0, 6);
 
+        char * chosenSubject = NULL;
+        int * studentIds = NULL;
+        int studentId;
+        Grade_t **foundGrades = NULL;
+        Grade_t *finalGrade = NULL;
+
+
         switch (choice)
         {
         case 1:
             addStudent(&students, &numStudents, &grades, &numGrades);
-            printf("Student: %d, %s, numStudents: %d\n", students[numStudents-1]->studentID, students[numStudents-1]->name, numStudents);
-            printf("Grade: %d, %d, %s, numGrades: %d\n", grades[numGrades-1]->studentID, grades[numGrades-1]->score, grades[numGrades-1]->subject, numGrades);
-            //printf("num grades found: %d\n", findNumGradesByStudentId(grades, numGrades, students[numStudents-1]->studentID));=
-            Grade_t **foundGrades = findGradesByStudentId(grades, numGrades, students[numStudents-1]->studentID);
-            int currInd = 0;
-            while(foundGrades[currInd] != NULL)
-            {
-                printf("Subject %d -> %s\n", currInd, foundGrades[currInd]->subject);
-                currInd++;
-            }
-            int *foundStudentIds = findStudentsBySubject(grades, numGrades, "cs");
-            currInd = 0;
-            while(foundStudentIds[currInd] != -1)
-            {
-                printf("%d: Student ID %d\n", currInd, foundStudentIds[currInd]);
-                currInd++;
-            }
             break;
         case 2:
             addTeacher(&teachers, &numTeachers);
-            printf("Teacher number: %d, Teacher ID: %d, Teacher name: %s\n", numTeachers,teachers[0]->teacherID, teachers[0]->name);
+            printf("Teacher number: %d, Teacher ID: %d, Teacher name: %s\n", numTeachers,teachers[numTeachers-1]->teacherID, teachers[numTeachers-1]->name);
             break;
         case 3:
-            //handleAssignGrade(grades, &gradeCount, students, studentCount);
+            assignGrade(&grades, &numGrades);
             break;
         case 4:
-            // getInputSubject(subject);
-            // findStudentBySubject(students, studentCount, subject);
+            chosenSubject = getStringInput();
+            studentIds = findStudentIdsBySubject(grades, numGrades, chosenSubject);
+            printStudentsFromIds(students, numStudents, studentIds);
             break;
         case 5:
             // getInputSubject(subject);
             // findTeacherBySubject(teachers, teacherCount, subject);
             break;
         case 6:
-            // handleFindGradesByStudentAndSubject(grades, gradeCount);
+            studentId = getIntInput(); // Need to verify this student exists
+            chosenSubject = getStringInput(); // Need to verify subject exists
+            foundGrades = findGradesByStudentId(grades, numGrades, studentId);
+            finalGrade = findStudentsGradeBySubject(foundGrades, chosenSubject);
+            // Ensure final grade is not null before print
+            printf("Student ID: %d, Subject: %s, Score: %d\n", finalGrade->studentID, finalGrade->subject, finalGrade->score);
             break;
         case 0:
             printf("Exiting the program.\n");
-            return 0;
+            break;
         default:
             printf("Invalid choice. Try again.\n");
         }
